@@ -32,11 +32,11 @@ router.register('perevaladded', PerevalAddedViewSet)
 urlpatterns = [
     path('swagger/', schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view, name='schema-redoc'),
-    #path('submit/', PerevalAddedViewSet.as_view({'post': 'submitData'}), name='submit'),
+    path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'),
     # path('', RedirectView.as_view(url='submit/')),
     path('', include(router.urls)),
     path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
     path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
-    path('perevaladded/patch/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'update', 'patch': 'update'}), name='pupdate'),
+    path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update'}), name='update'),
     path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
 ]
