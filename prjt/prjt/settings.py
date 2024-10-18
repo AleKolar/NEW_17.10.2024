@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+# from dotenv import load_dotenv
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -89,6 +91,21 @@ DATABASES = {
         },
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'tbase',
+#         'USER': os.getenv('FSTR_DB_LOGIN'),
+#         'PASSWORD': os.getenv('FSTR_DB_PASS'),
+#         'HOST': os.getenv('FSTR_DB_HOST'),
+#         'PORT': os.getenv('FSTR_DB_PORT'),
+#         'OPTIONS': {
+#             'options': '-c client_encoding=UTF8 -c search_path=public'
+#         },
+#     }
+# }
 
 
 # Password validation

@@ -12,7 +12,7 @@ class User(models.Model):
 class Coords(models.Model):
     latitude = models.CharField(max_length=20)
     longitude = models.CharField(max_length=20)
-    height = models.IntegerField()
+    height = models.IntegerField(default=True)
 
 
 class Level(models.Model):
