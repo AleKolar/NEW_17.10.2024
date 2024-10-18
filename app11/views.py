@@ -48,9 +48,20 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            instance = serializer.save()
+            response_data = {
+                "status": 200,
+                "message": "Объект успешно создан",
+                "id": instance.id
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "status": 400,
+                "message": "Bad Request (при нехватке полей)",
+                "id": None
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk=None, partial=False):
         pereval = PerevalAdded.objects.get(pk=pk)
@@ -84,3 +95,4 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Введите email пользователя в URL"}, status=status.HTTP_400_BAD_REQUEST)
+
