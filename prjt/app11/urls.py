@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework import permissions
-from drf_yasg1` import openapi
+from drf_yasg import openapi
 from rest_framework.schemas import get_schema_view
 
 from .views import UserViewSet, CoordsViewSet, LevelViewSet, ImagesViewSet, PerevalAddedViewSet

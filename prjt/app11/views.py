@@ -46,7 +46,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response({"message": "ID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request):
-        serializer = PerevalAddedSerializer(data=request.data)
+        serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
