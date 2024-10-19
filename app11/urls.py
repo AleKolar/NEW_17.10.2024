@@ -27,11 +27,16 @@ router.register('images', ImagesViewSet)
 router.register('perevaladded', PerevalAddedViewSet)
 
 
-
+schema_view = get_schema_view(
+    title="Your API",
+    description="API for your project",
+    version="1.0.0"
+)()
 
 urlpatterns = [
-    path('swagger/', schema_view, name='schema-swagger-ui'),
-    path('redoc/', schema_view, name='schema-redoc'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
     path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'),
     path('', include(router.urls)),
     path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
