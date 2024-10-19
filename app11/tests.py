@@ -39,6 +39,7 @@ class ModelsTestCase(TestCase):
 
 
 class PerevalAddedSerializerTestCase(TestCase):
+
     def setUp(self):
         self.user_data = {'email': 'test@test.com', 'phone': '1234567890', 'fam': 'Doe', 'name': 'John', 'otc': 'Smith'}
         self.coords_data = {'latitude': 40.7128, 'longitude': -74.0060}
@@ -66,6 +67,7 @@ class PerevalAddedSerializerTestCase(TestCase):
 
 
 class PerevalAddedViewSetTestCase(APITestCase):
+
     def setUp(self):
         self.user = User.objects.create(email='test@test.com', phone='1234567890', fam='Doe', name='John', otc='Smith')
         self.coords = Coords.objects.create(latitude=40.7128, longitude=-74.0060)
@@ -100,3 +102,45 @@ class PerevalAddedViewSetTestCase(APITestCase):
         url = reverse('perevaladded-submitDataByEmail', kwargs={'email': self.user.email})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_highest_pereval(self):
+        url = reverse(
+            'your-url-name-for-highest-pereval')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+
+    def test_highest_pereval_no_coords(self):
+        url = reverse(
+            'your-url-name-for-highest-pereval')
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response.data, {"message": "No Coords objects found"})
+
+
+class TestAPIEndpoints(APITestCase):
+
+    def setUp(self):
+        Coords.objects.create(latitude=40.7128, longitude=-74.0060, height=100)
+
+    def test_swagger_endpoint(self):
+        url = reverse('schema-swagger-ui')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_redoc_endpoint(self):
+        url = reverse('schema-redoc')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_highest_pereval_endpoint(self):
+        url = reverse('highest_pereval')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_create_endpoint(self):
+        url = reverse('create')
+        response = self.client.post(url, data={})
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)

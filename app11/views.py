@@ -1,10 +1,16 @@
+import os
+
+from django.db.models import Max
+from django.http import HttpResponse
+from django.template import loader
+
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import User, Level, Coords, Images, PerevalAdded
 from .serializers import UserSerializer, CoordsSerializer, LevelSerializer, ImagesSerializer, PerevalAddedSerializer
 
-from django.db.models import Max
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -109,3 +115,4 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "No Coords objects found"}, status=status.HTTP_404_NOT_FOUND)
+

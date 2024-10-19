@@ -26,9 +26,6 @@ router.register('levels', LevelViewSet)
 router.register('images', ImagesViewSet)
 router.register('perevaladded', PerevalAddedViewSet)
 
-
-
-
 urlpatterns = [
     path('swagger/', schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view, name='schema-redoc'),
@@ -41,4 +38,6 @@ urlpatterns = [
     path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
 
     path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'),
+
+
 ]
