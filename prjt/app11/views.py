@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -48,33 +49,53 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
     def create(self, request):
         serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            instance = serializer.save()
+            response_data = {
+                "status": 200,
+                "message": "Объект успешно создан",
+                "id": instance.id
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "status": 400,
+                "message": "Bad Request (при нехватке полей)",
+                "id": None
+            }
+            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
-    def update(self, request, pk=None, partial=False):
-        pereval = PerevalAdded.objects.get(pk=pk)
-        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial, context={'request': request})
+    class PerevalAddedViewSet(viewsets.ModelViewSet):
+        serializer_class = PerevalAddedSerializer
 
-        if serializer.is_valid():
-            user_data = request.data.get('user')
-            if user_data is not None:
-                instance_user = pereval.user
-                validating_user_fields = [
-                    instance_user.email != user_data.get('email'),
-                    instance_user.phone != user_data.get('phone'),
-                    instance_user.fam != user_data.get('fam'),
-                    instance_user.name != user_data.get('name'),
-                    instance_user.otc != user_data.get('otc'),
-                ]
-                if any(validating_user_fields):
-                    return Response({"state": 0, "message": "Данные пользователя не могут быть изменены"},
-                                    status=status.HTTP_400_BAD_REQUEST)
+        def update(self, request, pk=None, partial=False):
+            pereval = PerevalAdded.objects.get(pk=pk)
 
-            serializer.save()
-            return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
+            if pereval.status != 'new':
+                return Response({"state": 0, "message": "Редактирование доступно только при статусе 'new'"},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
+                                                context={'request': request})
+
+            if serializer.is_valid():
+                user_data = request.data.get('user')
+                if user_data is not None:
+                    instance_user = pereval.user
+                    validating_user_fields = [
+                        instance_user.email != user_data.get('email'),
+                        instance_user.phone != user_data.get('phone'),
+                        instance_user.fam != user_data.get('fam'),
+                        instance_user.name != user_data.get('name'),
+                        instance_user.otc != user_data.get('otc'),
+                    ]
+                    if any(validating_user_fields):
+                        return Response({"state": 0, "message": "Данные пользователя не могут быть изменены"},
+                                        status=status.HTTP_400_BAD_REQUEST)
+
+                serializer.save()
+                return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
+
+            return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])
     def submitDataByEmail(self, request, email=None):

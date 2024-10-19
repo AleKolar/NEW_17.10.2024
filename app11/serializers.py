@@ -22,7 +22,6 @@ class LevelSerializer(WritableNestedModelSerializer):
         fields = '__all__'
 
 
-
 class ImagesSerializer(WritableNestedModelSerializer):
     class Meta:
         model = Images
@@ -40,8 +39,6 @@ class PerevalAddedSerializer(WritableNestedModelSerializer):
         model = PerevalAdded
         fields = ['pk', 'status', 'url', 'beauty_title', 'title', 'other_titles', 'connect', 'add_time', 'user',
                   'coords', 'level', 'images']
-
-
 
         def create(self, validated_data):
             user_data = validated_data.pop('user')
