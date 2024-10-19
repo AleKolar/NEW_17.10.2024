@@ -84,3 +84,15 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"message": "Введите email пользователя в URL"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def highest_pereval(self, request):
+        max_height_obj = Coords.objects.order_by('-height').first()
+
+        if max_height_obj is not None:
+            max_height = max_height_obj.height
+            coords_objs = Coords.objects.filter(height=max_height)
+            serializer = CoordsSerializer(coords_objs, many=True, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"message": "No Coords objects found"}, status=status.HTTP_404_NOT_FOUND)
