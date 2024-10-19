@@ -105,7 +105,7 @@ class PerevalAddedViewSetTestCase(APITestCase):
 
     def test_highest_pereval(self):
         url = reverse(
-            'your-url-name-for-highest-pereval')
+            'highest_pereval')
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -113,7 +113,7 @@ class PerevalAddedViewSetTestCase(APITestCase):
 
     def test_highest_pereval_no_coords(self):
         url = reverse(
-            'your-url-name-for-highest-pereval')
+            'highest_pereval')
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
