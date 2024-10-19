@@ -40,4 +40,6 @@ urlpatterns = [
     path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update'}), name='update'),
     path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
 
+    path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'),
+
 ]
