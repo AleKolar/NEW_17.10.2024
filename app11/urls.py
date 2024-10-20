@@ -30,7 +30,7 @@ urlpatterns = [
     path('swagger/', schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view, name='schema-redoc'),
     path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'),
-    # path('', RedirectView.as_view(url='submit/')),
+    path('', RedirectView.as_view(url='perevaladded/')),
     path('', include(router.urls)),
     path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
     path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),

@@ -54,6 +54,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "ID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    # ТАК ДУБЛИРУЕТСЯ email !!!
     # def create(self, request):
     #     serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
     #     if serializer.is_valid():
