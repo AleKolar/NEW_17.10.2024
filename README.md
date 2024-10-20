@@ -3,26 +3,45 @@
 
 {
   "beauty_title": "pass ",
+  
   "title": "Pkhia",
+  
   "other_titles": "Triyev",
+  
   "connect": "",
  
   "add_time": "2021-09-22 13:18:13",
-  "user": {"email": "qwerty@mail.ru", 		
+  
+  "user": 
+  
+  {
+  "email": "qwerty@mail.ru", 
+  
         "fam": "Pupkin",
+	
 		 "name": "Vasily",
+   
 		 "otc": "Ivanovich",
+   
         "phone": "+7 555 55 55"}, 
  
-   "coords":{
+   "coords":
+   {
   "latitude": "45.3842",
+  
   "longitude": "7.1525",
+  
   "height": "1200"}
  
  
-  "level":{"winter": "", 
+  "level":
+  {
+  "winter": "", 
+  
   "summer": "1А",
+  
   "autumn": "1А",
+  
   "spring": ""},
  
    "images": [{"data":"<img1>", "title":"Saddle"}, {"data":"<img2>", "title":"Ascend"}]
