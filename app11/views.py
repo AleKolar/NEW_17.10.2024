@@ -110,9 +110,15 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-    def update(self, request, pk=None, partial=False):
+        def update(self, request, pk=None, partial=False):
         pereval = PerevalAdded.objects.get(pk=pk)
-        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial, context={'request': request})
+
+        if pereval.status != 'new':
+            return Response({"state": 0, "message": "Редактирование доступно только при статусе 'new'"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
+                                            context={'request': request})
 
         if serializer.is_valid():
             user_data = request.data.get('user')
@@ -133,6 +139,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
 
         return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
 
     @action(detail=False, methods=['get'])
     def submitDataByEmail(self, request, email=None):
