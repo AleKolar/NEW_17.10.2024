@@ -1,5 +1,6 @@
 import os
 
+from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Max
 from django.http import HttpResponse
 from django.template import loader
@@ -53,23 +54,61 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "ID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    # def create(self, request):
+    #     serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
+    #     if serializer.is_valid():
+    #         instance = serializer.save()
+    #         response_data = {
+    #             "status": 200,
+    #             "message": "Объект успешно создан",
+    #             "id": instance.id
+    #         }
+    #         return Response(response_data, status=status.HTTP_200_OK)
+    #     else:
+    #         response_data = {
+    #             "status": 400,
+    #             "message": "Bad Request (при нехватке полей)",
+    #             "id": None
+    #         }
+    #         return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
     def create(self, request):
-        serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            instance = serializer.save()
-            response_data = {
-                "status": 200,
-                "message": "Объект успешно создан",
-                "id": instance.id
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            response_data = {
-                "status": 400,
-                "message": "Bad Request (при нехватке полей)",
-                "id": None
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+        user_data = request.data.get('user')
+        user_email = user_data.get('email')
+
+        try:
+            user_instance = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            user_instance = User.objects.create(**user_data)
+        except MultipleObjectsReturned:
+            user_instance = User.objects.filter(email=user_email).first()
+
+        coords_data = request.data.get('coords')
+        level_data = request.data.get('level')
+        images_data = request.data.get('images')
+
+        coords_instance = Coords.objects.create(**coords_data)
+        level_instance = Level.objects.create(**level_data)
+
+        pereval_data = {
+            "user": user_instance,
+            "coords": coords_instance,
+            "level": level_instance,
+        }
+
+        pereval = PerevalAdded.objects.create(**pereval_data)
+
+        images_instances = [Images.objects.create(pereval=pereval, **image_data) for image_data in images_data]
+
+        pereval.images.set(images_instances)
+
+        response_data = {
+            "status": 200,
+            "message": "Объект успешно создан",
+            "id": pereval.id
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
 
     def update(self, request, pk=None, partial=False):
         pereval = PerevalAdded.objects.get(pk=pk)
