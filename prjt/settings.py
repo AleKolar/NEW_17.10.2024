@@ -83,7 +83,7 @@ load_dotenv()
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tbase',
+        'NAME': 'app11',
         'USER': os.getenv('FSTR_DB_LOGIN'),
         'PASSWORD': os.getenv('FSTR_DB_PASS'),
         'HOST': os.getenv('FSTR_DB_HOST'),
@@ -93,6 +93,7 @@ DATABASES = {
         },
     }
 }
+
 
 
 # Password validation

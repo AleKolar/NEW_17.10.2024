@@ -34,7 +34,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
     path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
-    path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update'}), name='update'),
+    path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update_instance'}), name='update_instance'),
     path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
 
     path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'),
