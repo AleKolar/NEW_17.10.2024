@@ -72,6 +72,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
     #         }
     #         return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+    # user_is_email , один email - один Пользователь
     def create(self, request):
         user_data = request.data.get('user')
         user_email = user_data.get('email')
