@@ -1,9 +1,17 @@
-from django.db.models import Count
+import os
+
+from django.core.exceptions import MultipleObjectsReturned
+from django.db.models import Max
+from django.http import HttpResponse
+from django.template import loader
+
 from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from .models import User, Coords, Level, Images, PerevalAdded
+from .models import User, Level, Coords, Images, PerevalAdded
 from .serializers import UserSerializer, CoordsSerializer, LevelSerializer, ImagesSerializer, PerevalAddedSerializer
+
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -35,6 +43,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         context.update({'request': self.request})
         return context
 
+
     def retrieve(self, request, pk=None):
         if pk:
             try:
@@ -46,62 +55,98 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "ID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
+    # ТАК ДУБЛИРУЕТСЯ email !!!
+    # def create(self, request):
+    #     serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
+    #     if serializer.is_valid():
+    #         instance = serializer.save()
+    #         response_data = {
+    #             "status": 200,
+    #             "message": "Объект успешно создан",
+    #             "id": instance.id
+    #         }
+    #         return Response(response_data, status=status.HTTP_200_OK)
+    #     else:
+    #         response_data = {
+    #             "status": 400,
+    #             "message": "Bad Request (при нехватке полей)",
+    #             "id": None
+    #         }
+    #         return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
 
+    # user_is_email , один email - один Пользователь
     def create(self, request):
-        serializer = PerevalAddedSerializer(data=request.data, context={'request': request})
+        user_data = request.data.get('user')
+        user_email = user_data.get('email')
+
+        try:
+            user_instance = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            user_instance = User.objects.create(**user_data)
+        except MultipleObjectsReturned:
+            user_instance = User.objects.filter(email=user_email).first()
+
+        coords_data = request.data.get('coords')
+        level_data = request.data.get('level')
+        images_data = request.data.get('images')
+
+        coords_instance = Coords.objects.create(**coords_data)
+        level_instance = Level.objects.create(**level_data)
+
+        pereval_data = {
+            "user": user_instance,
+            "coords": coords_instance,
+            "level": level_instance,
+            "beauty_title": request.data.get('beauty_title'),
+            "title": request.data.get('title'),
+            "other_titles": request.data.get('other_titles'),
+        }
+
+        pereval = PerevalAdded.objects.create(**pereval_data)
+
+        images_instances = [Images.objects.create(pereval=pereval, **image_data) for image_data in images_data]
+
+        pereval.images.set(images_instances)
+
+        response_data = {
+            "status": 200,
+            "message": "Объект успешно создан",
+            "id": pereval.id
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def update_instance(self, request, pk=None, partial=False): # Обновляем данные объекта
+        pereval = PerevalAdded.objects.get(pk=pk)
+
+        if pereval.status != 'new':
+            return Response({"state": 0, "message": "Редактирование доступно только при статусе 'new'"},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
+                                            context={'request': request})
+
         if serializer.is_valid():
-            instance = serializer.save()
-            response_data = {
-                "status": 200,
-                "message": "Объект успешно создан",
-                "id": instance.id
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        else:
-            response_data = {
-                "status": 400,
-                "message": "Bad Request (при нехватке полей)",
-                "id": None
-            }
-            return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+            user_data = request.data.get('user')
+            if user_data is not None:
+                instance_user = pereval.user
+                validating_user_fields = [
+                    instance_user.email != user_data.get('email'),
+                    instance_user.phone != user_data.get('phone'),
+                    instance_user.fam != user_data.get('fam'),
+                    instance_user.name != user_data.get('name'),
+                    instance_user.otc != user_data.get('otc'),
+                ]
+                if any(validating_user_fields):
+                    return Response({"state": 0, "message": "Данные пользователя не могут быть изменены"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.save()
+            return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
+
+        return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-
-
-    class PerevalAddedViewSet(viewsets.ModelViewSet):
-        serializer_class = PerevalAddedSerializer
-
-        def update(self, request, pk=None, partial=False):
-            pereval = PerevalAdded.objects.get(pk=pk)
-
-            if pereval.status != 'new':
-                return Response({"state": 0, "message": "Редактирование доступно только при статусе 'new'"},
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
-                                                context={'request': request})
-
-            if serializer.is_valid():
-                user_data = request.data.get('user')
-                if user_data is not None:
-                    instance_user = pereval.user
-                    validating_user_fields = [
-                        instance_user.email != user_data.get('email'),
-                        instance_user.phone != user_data.get('phone'),
-                        instance_user.fam != user_data.get('fam'),
-                        instance_user.name != user_data.get('name'),
-                        instance_user.otc != user_data.get('otc'),
-                    ]
-                    if any(validating_user_fields):
-                        return Response({"state": 0, "message": "Данные пользователя не могут быть изменены"},
-                                        status=status.HTTP_400_BAD_REQUEST)
-
-                serializer.save()
-                return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
-
-            return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get']) # Все объекты Пользователя с данным email
     def submitDataByEmail(self, request, email=None):
         if email:
             perevaladded_items = PerevalAdded.objects.filter(user__email=email)
@@ -110,7 +155,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "Введите email пользователя в URL"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'])  # Самая высокая точка в БД
     def highest_pereval(self, request):
         max_height_obj = Coords.objects.order_by('-height').first()
 
@@ -120,4 +165,16 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             serializer = CoordsSerializer(coords_objs, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "No Coords objects found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=False, methods=['get']) # Получаем статус объекта
+    def get_status(self, request, pk=None):
+        if pk:
+            try:
+                pereval = PerevalAdded.objects.get(pk=pk)
+                serializer = PerevalAddedSerializer(pereval, context=self.get_serializer_context())
+                return Response({'status': pereval.status}, status=status.HTTP_200_OK)
+            except PerevalAdded.DoesNotExist:
+                return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'ID parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
