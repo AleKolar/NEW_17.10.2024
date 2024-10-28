@@ -26,11 +26,12 @@ router.register('levels', LevelViewSet)
 router.register('images', ImagesViewSet)
 router.register('perevaladded', PerevalAddedViewSet)
 
+
 urlpatterns = [
     path('swagger/', schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view, name='schema-redoc'),
     path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'),
-    path('', RedirectView.as_view(url='perevaladded/')),
+    # path('', RedirectView.as_view(url='perevaladded/')),
     path('', include(router.urls)),
     path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
     path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
@@ -39,5 +40,7 @@ urlpatterns = [
 
     path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'),
 
+    # path('perevaladded/get_status/<int:pk>', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'),
+    path('status/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'),
 
 ]

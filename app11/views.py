@@ -166,3 +166,15 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "No Coords objects found"}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=False, methods=['get'])
+    def get_status(self, request, pk=None):
+        if pk:
+            try:
+                pereval = PerevalAdded.objects.get(pk=pk)
+                serializer = PerevalAddedSerializer(pereval, context=self.get_serializer_context())
+                return Response({'status': pereval.status}, status=status.HTTP_200_OK)
+            except PerevalAdded.DoesNotExist:
+                return Response({'error': 'Object not found'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'ID parameter is required'}, status=status.HTTP_400_BAD_REQUEST)
+
