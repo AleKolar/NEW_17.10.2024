@@ -43,6 +43,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         context.update({'request': self.request})
         return context
 
+
     def retrieve(self, request, pk=None):
         if pk:
             try:
@@ -96,9 +97,9 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             "user": user_instance,
             "coords": coords_instance,
             "level": level_instance,
-            "beauty_title": request.data.get('beauty_title'),  # Добавляем beauty_title
-            "title": request.data.get('title'),  # Добавляем title
-            "other_titles": request.data.get('other_titles'),  # Добавляем other_titles
+            "beauty_title": request.data.get('beauty_title'),
+            "title": request.data.get('title'),
+            "other_titles": request.data.get('other_titles'),
         }
 
         pereval = PerevalAdded.objects.create(**pereval_data)
@@ -114,7 +115,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-    def update_instance(self, request, pk=None, partial=False):
+    def update_instance(self, request, pk=None, partial=False): # Обновляем данные объекта
         pereval = PerevalAdded.objects.get(pk=pk)
 
         if pereval.status != 'new':
@@ -145,7 +146,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get']) # Все объекты Пользователя с данным email
     def submitDataByEmail(self, request, email=None):
         if email:
             perevaladded_items = PerevalAdded.objects.filter(user__email=email)
@@ -154,7 +155,7 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "Введите email пользователя в URL"}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'])  # Самая высокая точка в БД
     def highest_pereval(self, request):
         max_height_obj = Coords.objects.order_by('-height').first()
 
@@ -164,9 +165,9 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             serializer = CoordsSerializer(coords_objs, many=True, context={'request': request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response({"message": "No Coords objects found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "Объект не найден"}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get']) # Получаем статус объекта
     def get_status(self, request, pk=None):
         if pk:
             try:

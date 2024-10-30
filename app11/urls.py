@@ -6,6 +6,9 @@ from rest_framework.schemas import get_schema_view
 from .views import UserViewSet, CoordsViewSet, LevelViewSet, ImagesViewSet, PerevalAddedViewSet
 from rest_framework.routers import DefaultRouter
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 schema_view = get_schema_view(
     openapi.Info(
         title="tbase_api",
@@ -30,17 +33,19 @@ router.register('perevaladded', PerevalAddedViewSet)
 urlpatterns = [
     path('swagger/', schema_view, name='schema-swagger-ui'),
     path('redoc/', schema_view, name='schema-redoc'),
-    path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'),
+    path('create/', PerevalAddedViewSet.as_view({'post': 'create'}), name='create'), # Создаем новый объект
     # path('', RedirectView.as_view(url='perevaladded/')),
     path('', include(router.urls)),
-    path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
-    path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
-    path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update_instance'}), name='update_instance'),
-    path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
+    path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'), # Список всех объектов с данными
+    path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'), # Получаем объект по ID
+    path('update/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'retrieve', 'patch': 'update_instance'}), name='update_instance'), # Обновляем объект
+    path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'), # Все объекты Пользователя с данным email
 
-    path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'),
+    path('max/', PerevalAddedViewSet.as_view({'get': 'highest_pereval'}), name='highest_pereval'), # Самая высокая точка в БД
 
-    # path('perevaladded/get_status/<int:pk>', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'),
-    path('status/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'),
+    path('status/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'), # статус объекта по его ID
 
 ]
+
+# if settings.DEBUG:
+#     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
