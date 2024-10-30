@@ -6,6 +6,9 @@ from rest_framework.schemas import get_schema_view
 from .views import UserViewSet, CoordsViewSet, LevelViewSet, ImagesViewSet, PerevalAddedViewSet
 from rest_framework.routers import DefaultRouter
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 schema_view = get_schema_view(
     openapi.Info(
         title="tbase_api",
@@ -43,3 +46,4 @@ urlpatterns = [
     path('status/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'get_status'}), name='perevaladded-get-status'), # статус объекта по его ID
 
 ]
+

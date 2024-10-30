@@ -1,0 +1,35 @@
+#version: '3'
+#
+#services:
+#  web:
+#    build: .
+#    ports:
+#      - "8000:8000"
+#    volumes:
+#      - ./staticfiles: C:\Users\User\PycharmProjects\NEW_17.10.2024\prjt\staticfiles\docker-compose.yml
+version: '3.8'
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: app11
+    ports:
+      - "5432:5432"
+
+#your_app:
+#    build:
+#      context: ../
+#      dockerfile: Dockerfile
+#    command: python manage.py runserver 0.0.0.0:8000
+#    volumes:
+#      - ../app11:/prjt/app11
+#    depends_on:
+#      - db
