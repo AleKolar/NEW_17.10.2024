@@ -79,4 +79,4 @@
 3. coverage report
 4. coverage html
 
-Перейти на : http://127.0.0.1:8000/perevaladded
+
